@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Language" content="ja">
+<title>Chroma key</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+</head>
+<body>
+
+    <div id="bg">
+        <canvas id="result" width='300' height='240'></canvas>
+        <canvas id="result2" width='300' height='240'></canvas>
+    </div>
+
+
+
+ <script src="./colorFilter.js"></script>
+ <script src="./ReflectionRemoveFilter.js"></script>
+<script>
+  var resultCanvas = document.getElementById('result');
+    var resultCanvas2 = document.getElementById('result2');
+
+     var image1 = new Image();
+
+     image1.onload = function() {
+
+
+       var resultContext = resultCanvas.getContext('2d');
+
+         resultCanvas.width = image1.width /2;
+         resultCanvas.height =image1.height/2;
+       resultContext.drawImage(image1,0,0,resultCanvas.width,resultCanvas.height);
+     //baseContext.drawImage(image1,0,0,resultCanvas.width,resultCanvas.height);
+
+    //rrf.effectRemoveReflection(resultCanvas);
+    //rrf.effectSmoothReflection(resultCanvas);
+
+     colorFilters.edgeDetector(resultCanvas);
+
+     }
+     image1.src='test10.png';
+
+     var image2 = new Image();
+
+     image2.onload = function() {
+       resultCanvas2.width = image2.width/2 ;
+       resultCanvas2.height = image2.height/2;
+
+       var resultContext2 = resultCanvas2.getContext('2d');
+       resultContext2.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
+     //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
+
+    //rrf.effectRemoveReflection(resultCanvas);
+    //rrf.effectSmoothReflection(resultCanvas);
+     colorFilters.edgeDetector(resultCanvas2);
+
+     }
+     image2.src='test11.png';
+
+</script>
+</body>
+</html>
