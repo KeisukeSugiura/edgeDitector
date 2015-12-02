@@ -255,7 +255,7 @@ var colorFilter = (function(){
     return module;
 })();
 
-var colorFilters = (function(){
+var edgeDetector = (function(){
 
     var module = {};
 
@@ -358,10 +358,56 @@ var colorFilters = (function(){
         return resultImage;
     }
 
-    module.addEdgeImage = function(edgeMap1,edgeMap2){
+    module.getEdgeMap = function(canvas){
+      var _canvasW = canvas.width;
+      var _canvasH = canvas.height;
+      var context = canvas.getContext('2d');
+      var imageData = context.getImageData(0,0,canvas.width,canvas.height);
+      var data = imageData.data;
+      var grayScaleData = new Array(_canvasH*_canvasW);
+
+      for(var i=0;i<data.length;i=i+4){
+          grayScaleData[i/4] = module.grayScale(data[i],data[i+1],data[i+2]);
+      }
+
+      var resultImage = module.spatialFilter(grayScaleData,_canvasH,_canvasW,module.laplacian8Filter,3);
+
+      return resultImage;
+    }
+
+    module.getInitialEdgeMap = function(sWidth,sHeight){
+      var initialEdgeMap = new Array(sWidth*sHeight);
+      for(var i=0;i<sWidth*sHeight;i=i++){
+          initialEdgeMap[i] = 0;
+      }
+
+      return initialEdgeMap;
 
     }
 
+    module.getEdgeCount = function(EdgeMap){
+        var count = 0;
+        for(var i=0; i< EdgeMap.length; i++){
+          if(EdgeMap[i] == 1){
+            count++;
+          }
+        }
+        return count;
+    }
+
+    module.makeEdgeMap = function(edgeMapArr,targetCanvas){
+      var context = targetCanvas.getContext('2d');
+      async.forEachSeries(edgeMapArr, function(value, callback) {
+        //各要素実行
+        context.drawImage(value.map,value.left,value.top,value.width,value.height);
+        callback();
+
+      }, function() {
+        //最終実行
+        module.edgeDetector(targetCanvas);
+
+      });
+    }
 
 
     return module;

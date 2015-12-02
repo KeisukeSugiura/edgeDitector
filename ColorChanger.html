@@ -5,12 +5,17 @@
 <meta http-equiv="Content-Language" content="ja">
 <title>Chroma key</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="./async.min.js"></script>
 </head>
 <body>
 
     <div id="bg">
-        <canvas id="result" width='300' height='240'></canvas>
-        <canvas id="result2" width='300' height='240'></canvas>
+      <canvas id="resultResult" width='300' height='240'></canvas>
+      <canvas id="result" width='300' height='240'></canvas>
+      <canvas id="result2" width='300' height='240'></canvas>
+      <canvas id="result3" width='300' height='240'></canvas>
+      <canvas id="result4" width='300' height='240'></canvas>
+
     </div>
 
 
@@ -18,25 +23,77 @@
  <script src="./colorFilter.js"></script>
  <script src="./ReflectionRemoveFilter.js"></script>
 <script>
-  var resultCanvas = document.getElementById('result');
+    var resultCanvasResult = document.getElementById('resultResult');
+     resultCanvasResult.width = screen.width/2;
+     resultCanvasResult.height = screen.height/2;
+     var resultContextResult = resultCanvasResult.getContext('2d');
+     resultContextResult.fillRect(0,0,screen.width/2,screen.height/2);
+    // // console.log("imageResult("+String(screen.width)+","+String(screen.height)+")")
+    // resultContextResult.drawImage(image4,0,0,resultCanvasResult.width,resultCanvasResult.height);
+    // console.log(edgeDetector.getEdgeCount(edgeDetector.getEdgeMap(resultCanvasResult)));
+
+
+    var image = new Image();
+    var imageStack = new Array();
+
+    image.onload = function() {
+        var imageData = {
+          map:image,
+          left:0,
+          top:0,
+          width:image.width/2,
+          height:image.height/2
+    };
+    imageStack.push(imageData);
+    var nImage = new Image();
+     nImage.onload = function(){
+       var imageData = {
+         map:nImage,
+         left:400,
+         top:0,
+         width:nImage.width/2,
+         height:nImage.height/2
+       };
+       imageStack.push(imageData);
+
+       var n2Image = new Image();
+       n2Image.onload = function(){
+         var imageData = {
+           map:n2Image,
+           left:300,
+           top:300,
+           width:n2Image.width/2,
+           height:n2Image.height/2
+         };
+         imageStack.push(imageData);
+         edgeDetector.makeEdgeMap(imageStack,resultCanvasResult);
+       }
+          n2Image.src = 'test13.png';
+     }
+         nImage.src = 'test12.png';
+   }
+     image.src='test14.png';
+
+
+
+
+    var resultCanvas = document.getElementById('result');
     var resultCanvas2 = document.getElementById('result2');
+    var resultCanvas3 = document.getElementById('result3');
+    var resultCanvas4 = document.getElementById('result4');
 
-     var image1 = new Image();
+    var image1 = new Image();
 
-     image1.onload = function() {
+    image1.onload = function() {
+      var resultContext = resultCanvas.getContext('2d');
 
+       resultCanvas.width = image1.width /2;
+       resultCanvas.height =image1.height/2;
 
-       var resultContext = resultCanvas.getContext('2d');
+       console.log("image1("+String(image1.width)+","+String(image1.height)+")")
 
-         resultCanvas.width = image1.width /2;
-         resultCanvas.height =image1.height/2;
        resultContext.drawImage(image1,0,0,resultCanvas.width,resultCanvas.height);
-     //baseContext.drawImage(image1,0,0,resultCanvas.width,resultCanvas.height);
-
-    //rrf.effectRemoveReflection(resultCanvas);
-    //rrf.effectSmoothReflection(resultCanvas);
-
-     colorFilters.edgeDetector(resultCanvas);
+       edgeDetector.edgeDetector(resultCanvas);
 
      }
      image1.src='test10.png';
@@ -47,16 +104,66 @@
        resultCanvas2.width = image2.width/2 ;
        resultCanvas2.height = image2.height/2;
 
+       console.log("image2("+String(image2.width)+","+String(image2.height)+")")
+
        var resultContext2 = resultCanvas2.getContext('2d');
        resultContext2.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
      //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
 
     //rrf.effectRemoveReflection(resultCanvas);
     //rrf.effectSmoothReflection(resultCanvas);
-     colorFilters.edgeDetector(resultCanvas2);
+     edgeDetector.edgeDetector(resultCanvas2);
 
      }
      image2.src='test11.png';
+
+
+     var image3 = new Image();
+
+     image3.onload = function() {
+       resultCanvas3.width = image3.width/2 ;
+       resultCanvas3.height = image3.height/2;
+       console.log("image3("+String(image3.width)+","+String(image3.height)+")")
+
+       var resultContext3 = resultCanvas3.getContext('2d');
+       resultContext3.drawImage(image3,0,0,resultCanvas3.width,resultCanvas3.height);
+     //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
+
+    //rrf.effectRemoveReflection(resultCanvas);
+    //rrf.effectSmoothReflection(resultCanvas);
+     edgeDetector.edgeDetector(resultCanvas3);
+     //resultContextResult.drawImage(resultCanvas3,400,0,resultCanvas3.width,resultCanvas3.height);
+
+     }
+     image3.src='test12.png';
+
+
+     var image4 = new Image();
+
+     image4.onload = function() {
+       var resultContext4 = resultCanvas4.getContext('2d');
+
+        resultCanvas4.width = image4.width /2;
+        resultCanvas4.height =image4.height/2;
+
+        console.log("image4("+String(image4.width)+","+String(image4.height)+")")
+        resultContext4.drawImage(image4,0,0,resultCanvas4.width,resultCanvas4.height);
+        console.log(edgeDetector.getEdgeCount(edgeDetector.getEdgeMap(resultCanvas4)));
+
+
+        edgeDetector.edgeDetector(resultCanvas4);
+        //resultContextResult.drawImage(resultCanvas4,0,0,resultCanvas4.width,resultCanvas4.height);
+
+      }
+      image4.src='test13.png';
+
+
+
+
+
+
+
+
 
 </script>
 </body>
