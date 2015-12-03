@@ -10,11 +10,7 @@
 <body>
 
     <div id="bg">
-      <canvas id="resultResult" width='300' height='240'></canvas>
-      <canvas id="result" width='300' height='240'></canvas>
-      <canvas id="result2" width='300' height='240'></canvas>
-      <canvas id="result3" width='300' height='240'></canvas>
-      <canvas id="result4" width='300' height='240'></canvas>
+
 
     </div>
 
@@ -23,56 +19,128 @@
  <script src="./colorFilter.js"></script>
  <script src="./ReflectionRemoveFilter.js"></script>
 <script>
-    var resultCanvasResult = document.getElementById('resultResult');
-     resultCanvasResult.width = screen.width/2;
-     resultCanvasResult.height = screen.height/2;
-     var resultContextResult = resultCanvasResult.getContext('2d');
-     resultContextResult.fillRect(0,0,screen.width/2,screen.height/2);
+
+     var imageStack = new Array();
     // // console.log("imageResult("+String(screen.width)+","+String(screen.height)+")")
     // resultContextResult.drawImage(image4,0,0,resultCanvasResult.width,resultCanvasResult.height);
     // console.log(edgeDetector.getEdgeCount(edgeDetector.getEdgeMap(resultCanvasResult)));
 
+function makeEdgeMap(){
+  var image = new Image();
 
-    var image = new Image();
-    var imageStack = new Array();
+  image.onload = function() {
+      var imageData = {
+        focus:false,
+        map:image,
+        left:0,
+        top:0,
+        width:image.width/2,
+        height:image.height/2
+  };
+  imageStack.push(imageData);
+  var nImage = new Image();
+   nImage.onload = function(){
+     var imageData = {
+       focus:true,
+       map:nImage,
+       left:350,
+       top:30,
+       width:nImage.width/2,
+       height:nImage.height/2
+     };
+     imageStack.push(imageData);
 
-    image.onload = function() {
-        var imageData = {
-          map:image,
-          left:0,
-          top:0,
-          width:image.width/2,
-          height:image.height/2
-    };
-    imageStack.push(imageData);
-    var nImage = new Image();
-     nImage.onload = function(){
+
+     var n2Image = new Image();
+     n2Image.onload = function(){
        var imageData = {
-         map:nImage,
-         left:400,
-         top:0,
-         width:nImage.width/2,
-         height:nImage.height/2
+         map:n2Image,
+         left:300,
+         top:300,
+         width:n2Image.width/2,
+         height:n2Image.height/2
        };
-       imageStack.push(imageData);
-
-       var n2Image = new Image();
-       n2Image.onload = function(){
-         var imageData = {
-           map:n2Image,
-           left:300,
-           top:300,
-           width:n2Image.width/2,
-           height:n2Image.height/2
-         };
-         imageStack.push(imageData);
-         edgeDetector.makeEdgeMap(imageStack,resultCanvasResult);
-       }
-          n2Image.src = 'test13.png';
+       //imageStack.push(imageData);
+       var nImS = new Array();
+       nImS.push(imageData);
+       var result = edgeDetector.makeEdgeMap(imageStack);
+       var result2 = edgeDetector.makeEdgeMap(nImS);
+       document.body.appendChild(result);
+       makePositionCandidate(result,imageStack[1],result2);
      }
-         nImage.src = 'test12.png';
+       n2Image.src = 'test13.png';
    }
-     image.src='test14.png';
+       nImage.src = 'test12.png';
+ }
+   image.src='test14.png';
+}
+
+function makePositionCandidate(currentEdgeMap,activeWindow,referenceWindow){
+  //candidateの作成とポジションそーと
+  var activeWindow = imageStack[imageStack.length-1];
+  var candidatePositionList = new Array();
+
+  var candidatePosition1 = {
+      left: activeWindow.left+activeWindow.width,
+      top: activeWindow.top,
+      edgeCount:0
+  };
+
+  var candidatePosition2 = {
+    left: activeWindow.left+activeWindow.width,
+    top: activeWindow.top+activeWindow.height-referenceWindow.height,
+    edgeCount:0
+  }
+  var candidatePosition3 = {
+    left:activeWindow.left+activeWindow.width-referenceWindow.width,
+    top:activeWindow.top+activeWindow.height,
+    edgeCount:0
+  }
+  var candidatePosition4 = {
+    left:activeWindow.left,
+    top:activeWindow.top+activeWindow.height,
+    edgeCount:0
+  }
+  var candidatePosition5 = {
+    left:activeWindow.left-referenceWindow.width,
+    top:activeWindow.top+activeWindow.height-referenceWindow.height,
+    edgeCount:0
+  }
+  var candidatePosition6 = {
+    left:activeWindow.left-referenceWindow.width,
+    top:activeWindow.top,
+    edgeCount:0
+  }
+  var candidatePosition7 = {
+    left:activeWindow.left,
+    top:activeWindow.top+referenceWindow.height,
+    edgeCount:0
+  }
+  var candidatePosition8 = {
+    left:activeWindow.left+activeWindow.width-referenceWindow.width,
+    top:activeWindow.top+referenceWindow.height,
+    edgeCount:0
+  }
+
+  candidatePositionList.push(candidatePosition1);
+  candidatePositionList.push(candidatePosition2);
+  candidatePositionList.push(candidatePosition3);
+  candidatePositionList.push(candidatePosition4);
+  candidatePositionList.push(candidatePosition5);
+  candidatePositionList.push(candidatePosition6);
+  candidatePositionList.push(candidatePosition7);
+  candidatePositionList.push(candidatePosition8);
+  // currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,positionCandidateList
+  var recommentList = edgeDetector.recommendPositionWithpositionCandidateListandEdgeImage(currentEdgeMap,referenceWindow,candidatePositionList);
+  //callback(recommentList);
+  console.log(recommentList);
+}
+
+
+
+//アクティブウィンドウの配置をエッジマップとして作成
+makeEdgeMap();
+
 
 
 
@@ -82,80 +150,80 @@
     var resultCanvas3 = document.getElementById('result3');
     var resultCanvas4 = document.getElementById('result4');
 
-    var image1 = new Image();
-
-    image1.onload = function() {
-      var resultContext = resultCanvas.getContext('2d');
-
-       resultCanvas.width = image1.width /2;
-       resultCanvas.height =image1.height/2;
-
-       console.log("image1("+String(image1.width)+","+String(image1.height)+")")
-
-       resultContext.drawImage(image1,0,0,resultCanvas.width,resultCanvas.height);
-       edgeDetector.edgeDetector(resultCanvas);
-
-     }
-     image1.src='test10.png';
-
-     var image2 = new Image();
-
-     image2.onload = function() {
-       resultCanvas2.width = image2.width/2 ;
-       resultCanvas2.height = image2.height/2;
-
-       console.log("image2("+String(image2.width)+","+String(image2.height)+")")
-
-       var resultContext2 = resultCanvas2.getContext('2d');
-       resultContext2.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
-     //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
-
-    //rrf.effectRemoveReflection(resultCanvas);
-    //rrf.effectSmoothReflection(resultCanvas);
-     edgeDetector.edgeDetector(resultCanvas2);
-
-     }
-     image2.src='test11.png';
-
-
-     var image3 = new Image();
-
-     image3.onload = function() {
-       resultCanvas3.width = image3.width/2 ;
-       resultCanvas3.height = image3.height/2;
-       console.log("image3("+String(image3.width)+","+String(image3.height)+")")
-
-       var resultContext3 = resultCanvas3.getContext('2d');
-       resultContext3.drawImage(image3,0,0,resultCanvas3.width,resultCanvas3.height);
-     //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
-
-    //rrf.effectRemoveReflection(resultCanvas);
-    //rrf.effectSmoothReflection(resultCanvas);
-     edgeDetector.edgeDetector(resultCanvas3);
-     //resultContextResult.drawImage(resultCanvas3,400,0,resultCanvas3.width,resultCanvas3.height);
-
-     }
-     image3.src='test12.png';
-
-
-     var image4 = new Image();
-
-     image4.onload = function() {
-       var resultContext4 = resultCanvas4.getContext('2d');
-
-        resultCanvas4.width = image4.width /2;
-        resultCanvas4.height =image4.height/2;
-
-        console.log("image4("+String(image4.width)+","+String(image4.height)+")")
-        resultContext4.drawImage(image4,0,0,resultCanvas4.width,resultCanvas4.height);
-        console.log(edgeDetector.getEdgeCount(edgeDetector.getEdgeMap(resultCanvas4)));
-
-
-        edgeDetector.edgeDetector(resultCanvas4);
-        //resultContextResult.drawImage(resultCanvas4,0,0,resultCanvas4.width,resultCanvas4.height);
-
-      }
-      image4.src='test13.png';
+    // var image1 = new Image();
+    //
+    // image1.onload = function() {
+    //   var resultContext = resultCanvas.getContext('2d');
+    //
+    //    resultCanvas.width = image1.width /2;
+    //    resultCanvas.height =image1.height/2;
+    //
+    //    console.log("image1("+String(image1.width)+","+String(image1.height)+")")
+    //
+    //    resultContext.drawImage(image1,0,0,resultCanvas.width,resultCanvas.height);
+    //    edgeDetector.edgeDetector(resultCanvas);
+    //
+    //  }
+    //  image1.src='test10.png';
+    //
+    //  var image2 = new Image();
+    //
+    //  image2.onload = function() {
+    //    resultCanvas2.width = image2.width/2 ;
+    //    resultCanvas2.height = image2.height/2;
+    //
+    //    console.log("image2("+String(image2.width)+","+String(image2.height)+")")
+    //
+    //    var resultContext2 = resultCanvas2.getContext('2d');
+    //    resultContext2.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
+    //  //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
+    //
+    // //rrf.effectRemoveReflection(resultCanvas);
+    // //rrf.effectSmoothReflection(resultCanvas);
+    //  edgeDetector.edgeDetector(resultCanvas2);
+    //
+    //  }
+    //  image2.src='test11.png';
+    //
+    //
+    //  var image3 = new Image();
+    //
+    //  image3.onload = function() {
+    //    resultCanvas3.width = image3.width/2 ;
+    //    resultCanvas3.height = image3.height/2;
+    //    console.log("image3("+String(image3.width)+","+String(image3.height)+")")
+    //
+    //    var resultContext3 = resultCanvas3.getContext('2d');
+    //    resultContext3.drawImage(image3,0,0,resultCanvas3.width,resultCanvas3.height);
+    //  //baseContext.drawImage(image2,0,0,resultCanvas2.width,resultCanvas2.height);
+    //
+    // //rrf.effectRemoveReflection(resultCanvas);
+    // //rrf.effectSmoothReflection(resultCanvas);
+    //  edgeDetector.edgeDetector(resultCanvas3);
+    //  //resultContextResult.drawImage(resultCanvas3,400,0,resultCanvas3.width,resultCanvas3.height);
+    //
+    //  }
+    //  image3.src='test12.png';
+    //
+    //
+    //  var image4 = new Image();
+    //
+    //  image4.onload = function() {
+    //    var resultContext4 = resultCanvas4.getContext('2d');
+    //
+    //     resultCanvas4.width = image4.width /2;
+    //     resultCanvas4.height =image4.height/2;
+    //
+    //     console.log("image4("+String(image4.width)+","+String(image4.height)+")")
+    //     resultContext4.drawImage(image4,0,0,resultCanvas4.width,resultCanvas4.height);
+    //     console.log(edgeDetector.getEdgeCount(edgeDetector.getEdgeMap(resultCanvas4)));
+    //
+    //
+    //     edgeDetector.edgeDetector(resultCanvas4);
+    //     //resultContextResult.drawImage(resultCanvas4,0,0,resultCanvas4.width,resultCanvas4.height);
+    //
+    //   }
+    //   image4.src='test13.png';
 
 
 

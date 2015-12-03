@@ -395,8 +395,26 @@ var edgeDetector = (function(){
         return count;
     }
 
-    module.makeEdgeMap = function(edgeMapArr,targetCanvas){
+    module.getEdgeCountWithCanvas = function(canvas){
+      var count = 0;
+      var context = canvas.getContext('2d');
+      var imageData = context.getImageData(0,0,canvas.width,canvas.height);
+      var data = imageData.data;
+      for(var i=0; i<data.length; i=i+4){
+        if(data[i] > 50){
+          count++;
+        }
+      }
+
+      return count;
+    }
+
+    module.makeEdgeMap = function(edgeMapArr){
+      var targetCanvas = document.createElement('canvas');
+      targetCanvas.width = screen.width/2;
+      targetCanvas.height = screen.height/2;
       var context = targetCanvas.getContext('2d');
+      context.fillRect(0,0,screen.width/2,screen.height/2);
       async.forEachSeries(edgeMapArr, function(value, callback) {
         //各要素実行
         context.drawImage(value.map,value.left,value.top,value.width,value.height);
@@ -407,8 +425,47 @@ var edgeDetector = (function(){
         module.edgeDetector(targetCanvas);
 
       });
+      return targetCanvas;
     }
 
+    module.recommendPositionWithpositionCandidateListandEdgeImage = function(currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,positionCandidateList){
+      //edgeMap
+      //var currentImageData = currentEdgeMapCanvas.getImageData(0,0,currentEdgeMapCanvas.width,currentEdgeMapCanvas.height);
+      async.forEachSeries(positionCandidateList,function(value,callback){
+          value.edgeCount = module.getEdgeCountWithPositionCandidate(currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,value);
+          console.log(value);
+          callback();
+      },function(){
+        //sort
+          positionCandidateList.sort(function(a,b){
+            if(a.edgeCount<b.edgeCount){
+              return 1;
+            }else if(a.edgeCount>b.edgeCount){
+              return -1
+            }else{
+              return 0;
+            }
+          });
+      });
+
+
+      return positionCandidateList;
+    }
+
+    module.getEdgeCountWithPositionCandidate = function(currentEdgeMapCanvas,referenceWindowEdgeMap,positionCandidate){
+      //単:czImageDataにpositionCandidateの候補の場所におき確認する
+      //edgeMap処理済みを使用すること
+      var targetCanvas = document.createElement('canvas');
+      targetCanvas.width = screen.width;
+      targetCanvas.height = screen.height;
+      var targetContext = targetCanvas.getContext('2d');
+      targetContext.drawImage(currentEdgeMapCanvas,0,0);
+      targetContext.drawImage(referenceWindowEdgeMap,positionCandidate.left,positionCandidate.top);
+
+      var count = module.getEdgeCountWithCanvas(targetCanvas);
+      console.log(count);
+      return count;
+      }
 
     return module;
 
