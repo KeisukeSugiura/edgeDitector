@@ -32,10 +32,10 @@ function makeEdgeMap(){
       var imageData = {
         focus:false,
         map:image,
-        left:0,
+        left:900,
         top:0,
-        width:image.width/2,
-        height:image.height/2
+        width:image.width,
+        height:image.height
   };
   imageStack.push(imageData);
   var nImage = new Image();
@@ -43,10 +43,10 @@ function makeEdgeMap(){
      var imageData = {
        focus:true,
        map:nImage,
-       left:350,
+       left:200,
        top:30,
-       width:nImage.width/2,
-       height:nImage.height/2
+       width:nImage.width,
+       height:nImage.height
      };
      imageStack.push(imageData);
 
@@ -57,8 +57,8 @@ function makeEdgeMap(){
          map:n2Image,
          left:300,
          top:300,
-         width:n2Image.width/2,
-         height:n2Image.height/2
+         width:n2Image.width,
+         height:n2Image.height
        };
        //imageStack.push(imageData);
        var nImS = new Array();
@@ -66,7 +66,7 @@ function makeEdgeMap(){
        var result = edgeDetector.makeEdgeMap(imageStack);
        var result2 = edgeDetector.makeEdgeMap(nImS);
        document.body.appendChild(result);
-       makePositionCandidate(result,imageStack[1],result2);
+       makePositionCandidate(result,nImage,n2Image);
      }
        n2Image.src = 'test13.png';
    }
@@ -83,43 +83,51 @@ function makePositionCandidate(currentEdgeMap,activeWindow,referenceWindow){
   var candidatePosition1 = {
       left: activeWindow.left+activeWindow.width,
       top: activeWindow.top,
-      edgeCount:0
+      edgeCount:0,
+      number:1
   };
 
   var candidatePosition2 = {
     left: activeWindow.left+activeWindow.width,
     top: activeWindow.top+activeWindow.height-referenceWindow.height,
-    edgeCount:0
+    edgeCount:0,
+    number:2
   }
   var candidatePosition3 = {
     left:activeWindow.left+activeWindow.width-referenceWindow.width,
     top:activeWindow.top+activeWindow.height,
-    edgeCount:0
+    edgeCount:0,
+    number:3
   }
   var candidatePosition4 = {
     left:activeWindow.left,
     top:activeWindow.top+activeWindow.height,
-    edgeCount:0
+    edgeCount:0,
+    number:4
   }
   var candidatePosition5 = {
     left:activeWindow.left-referenceWindow.width,
     top:activeWindow.top+activeWindow.height-referenceWindow.height,
-    edgeCount:0
+    edgeCount:0,
+    number:5
   }
   var candidatePosition6 = {
     left:activeWindow.left-referenceWindow.width,
     top:activeWindow.top,
-    edgeCount:0
+    edgeCount:0,
+    number:6
   }
   var candidatePosition7 = {
     left:activeWindow.left,
-    top:activeWindow.top+referenceWindow.height,
-    edgeCount:0
+    top:activeWindow.top-referenceWindow.height,
+    edgeCount:0,
+    number:7
   }
   var candidatePosition8 = {
     left:activeWindow.left+activeWindow.width-referenceWindow.width,
-    top:activeWindow.top+referenceWindow.height,
-    edgeCount:0
+    top:activeWindow.top-referenceWindow.height,
+    edgeCount:0,
+    number:8
   }
 
   candidatePositionList.push(candidatePosition1);
@@ -133,7 +141,19 @@ function makePositionCandidate(currentEdgeMap,activeWindow,referenceWindow){
   // currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,positionCandidateList
   var recommentList = edgeDetector.recommendPositionWithpositionCandidateListandEdgeImage(currentEdgeMap,referenceWindow,candidatePositionList);
   //callback(recommentList);
-  console.log(recommentList);
+  //console.log(recommentList);
+  var recommendPosition = recommentList[0];
+  var resultCanvas = document.createElement('canvas');
+  resultCanvas.width = screen.width;
+  resultCanvas.height = screen.height;
+  var resultContext = resultCanvas.getContext('2d');
+  resultContext.drawImage(currentEdgeMap,0,0,currentEdgeMap.width,currentEdgeMap.height);
+  resultContext.drawImage(activeWindow.map,activeWindow.left,activeWindow.top,activeWindow.width,activeWindow.height);
+  console.log('edgeCount');
+  console.log(recommendPosition.edgeCount);
+
+  resultContext.drawImage(referenceWindow,recommendPosition.left,recommendPosition.top,referenceWindow.width,referenceWindow.height);
+  document.body.appendChild(resultCanvas);
 }
 
 

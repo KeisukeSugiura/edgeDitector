@@ -411,10 +411,10 @@ var edgeDetector = (function(){
 
     module.makeEdgeMap = function(edgeMapArr){
       var targetCanvas = document.createElement('canvas');
-      targetCanvas.width = screen.width/2;
-      targetCanvas.height = screen.height/2;
+      targetCanvas.width = screen.width;
+      targetCanvas.height = screen.height;
       var context = targetCanvas.getContext('2d');
-      context.fillRect(0,0,screen.width/2,screen.height/2);
+      context.fillRect(0,0,screen.width,screen.height);
       async.forEachSeries(edgeMapArr, function(value, callback) {
         //各要素実行
         context.drawImage(value.map,value.left,value.top,value.width,value.height);
@@ -437,15 +437,7 @@ var edgeDetector = (function(){
           callback();
       },function(){
         //sort
-          positionCandidateList.sort(function(a,b){
-            if(a.edgeCount<b.edgeCount){
-              return 1;
-            }else if(a.edgeCount>b.edgeCount){
-              return -1
-            }else{
-              return 0;
-            }
-          });
+
       });
 
 
