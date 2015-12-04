@@ -397,11 +397,9 @@ var edgeDetector = (function(){
 
     module.getEdgeCountWithCanvas = function(canvas){
       var count = 0;
-      var context = canvas.getContext('2d');
-      var imageData = context.getImageData(0,0,canvas.width,canvas.height);
-      var data = imageData.data;
-      for(var i=0; i<data.length; i=i+4){
-        if(data[i] > 50){
+      var edgeMap = module.getEdgeMap(canvas);
+      for(var i=0; i<edgeMap.length; i++){
+        if(edgeMap[i] > 50){
           count++;
         }
       }
@@ -428,15 +426,40 @@ var edgeDetector = (function(){
       return targetCanvas;
     }
 
-    module.recommendPositionWithpositionCandidateListandEdgeImage = function(currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,positionCandidateList){
+    module.recommendPositionWithpositionCandidateListandEdgeImage = function(currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,activeWindowCanvas,positionCandidateList){
       //edgeMap
       //var currentImageData = currentEdgeMapCanvas.getImageData(0,0,currentEdgeMapCanvas.width,currentEdgeMapCanvas.height);
-      async.forEachSeries(positionCandidateList,function(value,callback){
+      async.map(positionCandidateList,function(value,callback){
           value.edgeCount = module.getEdgeCountWithPositionCandidate(currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,value);
           console.log(value);
-          callback();
-      },function(){
+          callback(null,value);
+      },function(err,resultsCount){
         //sort
+          async.sortBy(resultsCount, function(item, done){
+              done(null, item.edgeCount*-1);
+          }, function(err,results){
+              if (err){
+                 console.error(err);
+              }else{
+               console.log(results);
+              var recommendPosition = results[0];
+              var resultCanvas = document.createElement('canvas');
+              resultCanvas.width = screen.width;
+              resultCanvas.height = screen.height;
+              var resultContext = resultCanvas.getContext('2d');
+              resultContext.drawImage(currentEdgeMapCanvas,0,0,currentEdgeMapCanvas.width,currentEdgeMapCanvas.height);
+              resultContext.drawImage(activeWindowCanvas.map,activeWindowCanvas.left,activeWindowCanvas.top,activeWindowCanvas.width,activeWindowCanvas.height);
+              console.log('edgeCount');
+              console.log(recommendPosition.edgeCount);
+
+              resultContext.drawImage(referenceWindowEdgeMapCanvas,recommendPosition.left,recommendPosition.top,referenceWindowEdgeMapCanvas.width,referenceWindowEdgeMapCanvas.height);
+              // edgeDetector.edgeDetector(resultCanvas);
+              document.body.appendChild(resultCanvas);
+              }
+
+          });
+
+
 
       });
 

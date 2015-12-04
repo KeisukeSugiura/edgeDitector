@@ -64,8 +64,8 @@ function makeEdgeMap(){
        var nImS = new Array();
        nImS.push(imageData);
        var result = edgeDetector.makeEdgeMap(imageStack);
-       var result2 = edgeDetector.makeEdgeMap(nImS);
-       document.body.appendChild(result);
+      // var result2 = edgeDetector.makeEdgeMap(nImS);
+      // document.body.appendChild(result);
        makePositionCandidate(result,nImage,n2Image);
      }
        n2Image.src = 'test13.png';
@@ -139,21 +139,10 @@ function makePositionCandidate(currentEdgeMap,activeWindow,referenceWindow){
   candidatePositionList.push(candidatePosition7);
   candidatePositionList.push(candidatePosition8);
   // currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,positionCandidateList
-  var recommentList = edgeDetector.recommendPositionWithpositionCandidateListandEdgeImage(currentEdgeMap,referenceWindow,candidatePositionList);
+  var recommentList = edgeDetector.recommendPositionWithpositionCandidateListandEdgeImage(currentEdgeMap,referenceWindow,activeWindow,candidatePositionList);
   //callback(recommentList);
   //console.log(recommentList);
-  var recommendPosition = recommentList[0];
-  var resultCanvas = document.createElement('canvas');
-  resultCanvas.width = screen.width;
-  resultCanvas.height = screen.height;
-  var resultContext = resultCanvas.getContext('2d');
-  resultContext.drawImage(currentEdgeMap,0,0,currentEdgeMap.width,currentEdgeMap.height);
-  resultContext.drawImage(activeWindow.map,activeWindow.left,activeWindow.top,activeWindow.width,activeWindow.height);
-  console.log('edgeCount');
-  console.log(recommendPosition.edgeCount);
 
-  resultContext.drawImage(referenceWindow,recommendPosition.left,recommendPosition.top,referenceWindow.width,referenceWindow.height);
-  document.body.appendChild(resultCanvas);
 }
 
 
