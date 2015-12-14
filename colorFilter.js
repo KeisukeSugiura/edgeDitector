@@ -255,6 +255,11 @@ var colorFilter = (function(){
     return module;
 })();
 
+
+
+
+
+
 var edgeDetector = (function(){
 
     var module = {};
@@ -453,7 +458,7 @@ var edgeDetector = (function(){
               console.log(recommendPosition.edgeCount);
 
               resultContext.drawImage(referenceWindowEdgeMapCanvas,recommendPosition.left,recommendPosition.top,referenceWindowEdgeMapCanvas.width,referenceWindowEdgeMapCanvas.height);
-              // edgeDetector.edgeDetector(resultCanvas);
+               edgeDetector.edgeDetector(resultCanvas);
               document.body.appendChild(resultCanvas);
               }
 
@@ -481,6 +486,26 @@ var edgeDetector = (function(){
       console.log(count);
       return count;
       }
+
+      module.getTranscarentImageUrl = function(image,width,height){
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        var context = canvas.getContext('2d');
+        context.drawImage(image,0,0);
+        console.log(canvas.width);
+        var imageData = context.getImageData(0,0,canvas.width,canvas.height);
+        var data = imageData.data;
+        for(var i =0; i< data.length;i = i+4){
+            data[i+3] = data[i+3] / 2; 
+        }
+        console.log(data.length/4);
+        imageData.data = data;
+        context.putImageData(imageData, 0, 0);
+        var dataurl = canvas.toDataURL("image/png");
+
+        return dataurl;
+    }
 
     return module;
 

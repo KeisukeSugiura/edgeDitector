@@ -139,6 +139,10 @@ function makePositionCandidate(currentEdgeMap,activeWindow,referenceWindow){
   candidatePositionList.push(candidatePosition7);
   candidatePositionList.push(candidatePosition8);
   // currentEdgeMapCanvas,referenceWindowEdgeMapCanvas,positionCandidateList
+  // 
+  // currentEdgeMap:参照ウィンドウ以外全部書いたやつ
+  // referenceWindow:参照ウィンドウ
+  // activeWindow:アクティブウィンドウ
   var recommentList = edgeDetector.recommendPositionWithpositionCandidateListandEdgeImage(currentEdgeMap,referenceWindow,activeWindow,candidatePositionList);
   //callback(recommentList);
   //console.log(recommentList);
@@ -245,3 +249,5 @@ makeEdgeMap();
 </script>
 </body>
 </html>
+
+
